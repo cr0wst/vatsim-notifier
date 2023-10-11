@@ -7,6 +7,16 @@ export const db = knex({
   searchPath: ['knex', 'public'],
 })
 
+export type DiscordChannel = {
+  id: string,
+  config: {
+    filters: {
+      property: string,
+      value: string
+    }[]
+  }
+}
+
 export type Controller = {
   batch: string,
   cid: number,

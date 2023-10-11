@@ -7,4 +7,5 @@ export default {
   SCRAPE_INTERVAL_MS: toNumber(process.env.SCRAPE_INTERVAL_MS!!),
   LOG_LEVEL: process.env.LOG_LEVEL!!,
   DB_CONNECTION_STRING: process.env.DB_CONNECTION_STRING!!,
+  DISCORD_BOT_TOKEN: process.env.DISCORD_BOT_TOKEN!!,
 };

@@ -3,12 +3,16 @@ import { db } from "./db";
 import { generateControllerBatchDifference } from "./diff";
 import { loadControllerData } from "./load";
 import config from "./config";
+import { Client, GatewayIntentBits } from "discord.js";
+import { reportControllerDifferences } from "./discord";
+
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 async function main() {
   await db.migrate.latest();
-
+  await client.login(config.DISCORD_BOT_TOKEN);
   // Run once on startup
-  await run()
+  await run();
 
   // call run every configured interval
   await setInterval(run, config.SCRAPE_INTERVAL_MS);
@@ -25,23 +29,14 @@ async function run() {
     const differences = await generateControllerBatchDifference(previousBatchId, currentBatchId);
 
     log.debug(`${differences.added.length} controllers were added.`);
-    if (differences.added.length > 0) {
-      differences.added.forEach((controller) => {
-        log.debug(`[SIGN ON]  ${controller.callsign} ${controller.name} (${controller.cid}) ${controller.frequency}`);
-      });
-    }
-
     log.debug(`${differences.removed.length} controllers were removed.`);
-    if (differences.removed.length > 0) {
-      differences.removed.forEach((controller) => {
-        log.debug(`[SIGN OFF] ${controller.callsign} ${controller.name} (${controller.cid}) ${controller.frequency}`);
-      });
-    }
+
+    await reportControllerDifferences(differences, client);
 
     // Now delete the previous batch since it's no longer needed.
     log.debug(`Deleting previous batch ${previousBatchId}.`);
-    await db("batches").where("id", previousBatchId).delete();
-    await db("controllers").where("batch", previousBatchId).delete();
+    await db("batches").where("id", '<>', currentBatchId).delete();
+    await db("controllers").where("batch", '<>', currentBatchId).delete();
   }
 }
 

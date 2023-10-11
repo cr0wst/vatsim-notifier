@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import log from "./log";
-import { fetchData } from "./VatsimClient";
-import { db } from "./db";
+import { fetchData } from "./vatsim";
+import { Controller, db } from "./db";
 
 export async function loadControllerData(): Promise<string> {
   const batchId = randomUUID();
