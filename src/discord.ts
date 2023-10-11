@@ -14,6 +14,9 @@ export async function reportControllerDifferences(differences: any, discordClien
       break;
     }
     const signOns = differences.added.filter((controller: Controller) => {
+      if (channel.config.filters.length === 0) {
+        return true;
+      }
       return channel.config.filters.some((filter) => {
         /* @ts-ignore */
         return controller[filter.property] === filter.value;
@@ -21,6 +24,9 @@ export async function reportControllerDifferences(differences: any, discordClien
     });
 
     const signOffs = differences.removed.filter((controller: Controller) => {
+      if (channel.config.filters.length === 0) {
+        return true;
+      }
       return channel.config.filters.some((filter) => {
         /* @ts-ignore */
         return controller[filter.property] === filter.value;
